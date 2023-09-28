@@ -10,10 +10,6 @@
 # coverage
 *.out
 
-Db folder
-
-db/
-
 # misc
 .vscode
 DS_Store
