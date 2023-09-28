@@ -1,3 +1,6 @@
+DSN="host=localhost port=5432 user=root password=secret dbname=gocoffeedb sslmode=disable timezone=UTC connect_timeout=5"
+PORT=8080
+
 DB_DOCKER_CONTAINER=gocoffee_db
 BINARY_NAME=gocoffee
 
