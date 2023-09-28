@@ -3,6 +3,7 @@
 *.dll
 *.so
 *.dylib
+gocoffee
 
 # test binary
 *.test
