@@ -3,16 +3,13 @@
 *.dll
 *.so
 *.dylib
+gocoffee
 
 # test binary
 *.test
 
 # coverage
 *.out
-
-Db folder
-
-db/
 
 # misc
 .vscode

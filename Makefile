@@ -1,3 +1,6 @@
+DSN="host=localhost port=5432 user=root password=secret dbname=gocoffeedb sslmode=disable timezone=UTC connect_timeout=5"
+PORT=8080
+
 DB_DOCKER_CONTAINER=gocoffee_db
 BINARY_NAME=gocoffee
 
@@ -11,7 +14,7 @@ createdb:
 
 # stop other docker containers
 stop-containers:
-	@echo "Stopping other docker containers"
+	@echo "stopping other docker containers"
 	if [ $$(docker ps -q) ]; then \
 		echo "found and stopped containers..."; \
 		docker stop $$(docker ps -q); \
@@ -32,5 +35,21 @@ migrate-up:
 migrate-down:
 	sqlx migrate revert --database-url "postgres://root:secret@localhost:5432/gocoffeedb?sslmode=disable"
 
-run:
-	go run cmd/server/main.go
+build:
+	@echo "building backend api binary"
+	go build -o ${BINARY_NAME} cmd/server/*.go
+	@echo "binary built!"
+
+run: build stop-containers start-docker
+	@echo "starting api"
+	@env PORT=${PORT} DSN=${DSN} ./${BINARY_NAME} &
+	@echo "api started!"
+
+stop:
+	@echo "stopping api"
+	@-pkill -SIGTERM -f "./${BINARY_NAME}"
+	@echo "api stopped!"
+
+start: run
+
+restart: stop start
