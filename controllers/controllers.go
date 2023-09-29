@@ -82,3 +82,14 @@ func UpdateCoffee(w http.ResponseWriter, r *http.Request) {
 		helpers.WriteJSON(w, http.StatusOK, coffeeObj)
 	}
 }
+
+func DeleteCoffee(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	err := coffee.DeleteCoffee(id)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	helpers.WriteJSON(w, http.StatusOK, "delete confirmed")
+}
