@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"github.com/vrtttx/gocoffee/database"
+	"github.com/vrtttx/gocoffee/router"
+	"github.com/vrtttx/gocoffee/services"
 )
 
 type Config struct {
@@ -15,6 +17,7 @@ type Config struct {
 
 type Application struct {
 	Config Config
+	Models services.Models
 }
 
 // global port variable for both main and serve
@@ -25,6 +28,7 @@ func (app *Application) Serve() error {
 
 	srv := &http.Server{
 		Addr: fmt.Sprintf(":%s", port),
+		Handler: router.Routes(),
 	}
 
 	return srv.ListenAndServe()

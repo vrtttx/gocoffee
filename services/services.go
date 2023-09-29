@@ -56,3 +56,104 @@ func (c *Coffee) GetAllCoffees() ([]*Coffee, error) {
 
 	return coffees, nil
 }
+
+func (c *Coffee) GetCoffeeById(id string) (*Coffee, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+
+	defer cancel()
+
+	query := `SELECT * FROM coffees WHERE id = $1`
+
+	var coffee Coffee
+
+	row := db.QueryRowContext(ctx, query, id)
+
+	err := row.Scan(
+		&coffee.ID,
+        &coffee.Name,
+        &coffee.Image,
+        &coffee.Region,
+        &coffee.Roast,
+        &coffee.Price,
+        &coffee.GrindUnit,
+        &coffee.CreatedAt,
+        &coffee.UpdatedAt,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &coffee, nil
+}
+
+func (c *Coffee) CreateCoffee(coffee Coffee) (*Coffee, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+
+	defer cancel()
+
+	query := `INSERT INTO coffees (name, image, region, roast, price, grind_unit, created_at, updated_at) values ($1, $2, $3, $4, $5, $6, $7, $8) returning *`
+
+	_, err := db.ExecContext(
+		ctx,
+		query,
+		coffee.Name,
+		coffee.Image,
+		coffee.Region,
+		coffee.Roast,
+		coffee.Price,
+		coffee.GrindUnit,
+		time.Now(),
+		time.Now(),
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &coffee, nil
+}
+
+func (c *Coffee) UpdateCoffee(id string, body Coffee) (*Coffee, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+
+	defer cancel()
+
+	query := `UPDATE coffees SET name = $1, image = $2, region = $3, roast = $4, price = $5, grind_unit = $6, updated_at = $7 WHERE id = $8`
+
+	// make sure to update the c.Name with body.Name
+	_, err := db.ExecContext(
+		ctx,
+        query,
+        body.Name,
+        body.Image,
+		body.Region,
+        body.Roast,
+        body.Price,
+        body.GrindUnit,
+        body.UpdatedAt,
+        id,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &body, nil
+}
+
+func (c *Coffee) DeleteCoffee(id string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+
+	defer cancel()
+
+	query := `DELETE FROM coffees WHERE id = $1`
+
+	_, err := db.ExecContext(ctx, query, id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
