@@ -56,6 +56,7 @@ func (c *Coffee) GetAllCoffees() ([]*Coffee, error) {
 
 	return coffees, nil
 }
+
 func (c *Coffee) GetCoffeeById(id string) (*Coffee, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 
@@ -77,6 +78,33 @@ func (c *Coffee) GetCoffeeById(id string) (*Coffee, error) {
         &coffee.GrindUnit,
         &coffee.CreatedAt,
         &coffee.UpdatedAt,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &coffee, nil
+}
+
+func (c *Coffee) CreateCoffee(coffee Coffee) (*Coffee, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+
+	defer cancel()
+
+	query := `INSERT INTO coffees (name, image, region, roast, price, grind_unit, created_at, updated_at) values ($1, $2, $3, $4, $5, $6, $7, $8) returning *`
+
+	_, err := db.ExecContext(
+		ctx,
+		query,
+		coffee.Name,
+		coffee.Image,
+		coffee.Region,
+		coffee.Roast,
+		coffee.Price,
+		coffee.GrindUnit,
+		time.Now(),
+		time.Now(),
 	)
 
 	if err != nil {
