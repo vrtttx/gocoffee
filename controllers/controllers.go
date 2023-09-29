@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -36,4 +37,25 @@ func GetCoffeeById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helpers.WriteJSON(w, http.StatusOK, coffee)
+}
+
+func CreateCoffee(w http.ResponseWriter, r *http.Request) {
+	var coffeeResp services.Coffee
+
+	err := json.NewDecoder(r.Body).Decode(&coffeeResp)
+
+	if err != nil {
+		helpers.MessageLogs.ErrorLog.Println(err)
+
+		return
+	}
+
+	helpers.WriteJSON(w, http.StatusOK, coffeeResp)
+
+	coffeeCreated, err := coffee.CreateCoffee(coffeeResp)
+
+	if err != nil {
+		helpers.MessageLogs.ErrorLog.Println(err)
+		helpers.WriteJSON(w, http.StatusOK, coffeeCreated)
+	}
 }
